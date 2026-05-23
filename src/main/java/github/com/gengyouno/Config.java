@@ -9,5 +9,9 @@ public class Config {
             .comment("Whether /music may play tracks from http(s) URLs, for example GitHub raw links.")
             .define("enableGithubUrls", true);
 
+    public static final ModConfigSpec.ConfigValue<String> DEFAULT_LIBRARY_URL = BUILDER
+            .comment("Default remote library.json URL. Leave blank to only use local musiclibraries JSON files.")
+            .define("defaultLibraryUrl", "https://raw.githubusercontent.com/gengyoubo/LocalMusicMode/main/musiclibraries/library.json");
+
     static final ModConfigSpec SPEC = BUILDER.build();
 }
