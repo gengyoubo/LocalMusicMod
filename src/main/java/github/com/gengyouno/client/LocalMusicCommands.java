@@ -36,14 +36,14 @@ public final class LocalMusicCommands {
             return 0;
         }
 
-        LocalMusicPlayer.play(track);
-        context.getSource().sendSuccess(() -> Component.literal("Queued music: " + track.displayName()), false);
+        LocalMusicClientNetworking.requestPlay(track);
+        context.getSource().sendSuccess(() -> Component.literal("Queued music for all players: " + track.displayName()), false);
         return 1;
     }
 
     private static int stop(CommandContext<CommandSourceStack> context) {
-        LocalMusicPlayer.stop();
-        context.getSource().sendSuccess(() -> Component.literal("Stopping local music"), false);
+        LocalMusicClientNetworking.requestStop();
+        context.getSource().sendSuccess(() -> Component.literal("Stopping music for all players"), false);
         return 1;
     }
 }

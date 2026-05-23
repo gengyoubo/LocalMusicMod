@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import github.com.gengyouno.item.MusicBookItem;
+import github.com.gengyouno.network.LocalMusicNetworking;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -38,6 +39,7 @@ public class Localmusicmod {
 
     public Localmusicmod(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(LocalMusicNetworking::register);
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

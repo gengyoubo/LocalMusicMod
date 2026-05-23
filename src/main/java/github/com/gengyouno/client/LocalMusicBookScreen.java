@@ -65,7 +65,7 @@ public class LocalMusicBookScreen extends Screen {
             reloadTracks();
             rebuildBookWidgets();
         }).bounds(left, y, 78, 20).build());
-        addRenderableWidget(Button.builder(Component.translatable("screen.localmusicmod.music_book.stop"), button -> LocalMusicPlayer.stop())
+        addRenderableWidget(Button.builder(Component.translatable("screen.localmusicmod.music_book.stop"), button -> LocalMusicClientNetworking.requestStop())
                 .bounds(left + panelWidth - 156, y, 74, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())
                 .bounds(left + panelWidth - 78, y, 78, 20).build());
@@ -103,7 +103,7 @@ public class LocalMusicBookScreen extends Screen {
                 LocalMusicTrack track = filteredTracks.get(i);
                 int row = i - start;
                 Component label = Component.literal(track.displayName() + "  [" + track.id() + "]");
-                addRenderableWidget(Button.builder(label, button -> LocalMusicPlayer.play(track))
+                addRenderableWidget(Button.builder(label, button -> LocalMusicClientNetworking.requestPlay(track))
                         .bounds(left, firstTrackY + row * ROW_HEIGHT, panelWidth, 20)
                         .build());
             }
@@ -155,7 +155,7 @@ public class LocalMusicBookScreen extends Screen {
             return;
         }
 
-        LocalMusicPlayer.play(new LocalMusicTrack("direct_link", "Direct Link", null, directUrl, 1.0F, false));
+        LocalMusicClientNetworking.requestPlay(new LocalMusicTrack("direct_link", "Direct Link", null, directUrl, 1.0F, false));
     }
 
     private int tracksPerPage(int y) {

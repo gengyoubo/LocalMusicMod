@@ -1,6 +1,7 @@
 package github.com.gengyouno;
 
 import github.com.gengyouno.client.LocalMusicCommands;
+import github.com.gengyouno.client.LocalMusicClientNetworking;
 import github.com.gengyouno.client.LocalMusicPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -11,6 +12,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 @Mod(value = Localmusicmod.MODID, dist = Dist.CLIENT)
@@ -28,6 +30,11 @@ public class LocalmusicmodClient {
     @SubscribeEvent
     static void onRegisterClientCommands(RegisterClientCommandsEvent event) {
         LocalMusicCommands.register(event);
+    }
+
+    @SubscribeEvent
+    static void onRegisterPayloadHandlers(RegisterPayloadHandlersEvent event) {
+        LocalMusicClientNetworking.register(event);
     }
 
     @SubscribeEvent
