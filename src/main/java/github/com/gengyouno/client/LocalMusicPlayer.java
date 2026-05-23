@@ -1,15 +1,12 @@
 package github.com.gengyouno.client;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.Locale;
@@ -24,13 +21,10 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineEvent;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.stb.STBVorbis;
-import org.lwjgl.system.MemoryUtil;
-
 import github.com.gengyouno.Config;
 import github.com.gengyouno.Localmusicmod;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.sounds.JOrbisAudioStream;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 
@@ -174,34 +168,19 @@ public final class LocalMusicPlayer {
     }
 
     private static DecodedAudio decodeOgg(byte[] bytes) throws IOException {
-        ByteBuffer encoded = BufferUtils.createByteBuffer(bytes.length);
-        encoded.put(bytes).flip();
+        try (JOrbisAudioStream stream = new JOrbisAudioStream(new ByteArrayInputStream(bytes))) {
+            AudioFormat source = stream.getFormat();
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        IntBuffer channels = BufferUtils.createIntBuffer(1);
-        IntBuffer sampleRate = BufferUtils.createIntBuffer(1);
-        ShortBuffer pcm = STBVorbis.stb_vorbis_decode_memory(encoded, channels, sampleRate);
-        if (pcm == null) {
-            throw new IOException("Could not decode OGG/Vorbis audio");
-        }
-
-        try {
-            ByteBuffer pcmBytes = ByteBuffer.allocate(pcm.remaining() * Short.BYTES).order(ByteOrder.LITTLE_ENDIAN);
-            while (pcm.hasRemaining()) {
-                pcmBytes.putShort(pcm.get());
+            while (stream.readChunk(sample -> {
+                int value = Math.max(-32768, Math.min(32767, (int) (sample * 32767.0F)));
+                output.write(value & 0xFF);
+                output.write(value >> 8 & 0xFF);
+            })) {
             }
 
-            AudioFormat format = new AudioFormat(
-                    AudioFormat.Encoding.PCM_SIGNED,
-                    sampleRate.get(0),
-                    16,
-                    channels.get(0),
-                    channels.get(0) * Short.BYTES,
-                    sampleRate.get(0),
-                    false
-            );
-            return new DecodedAudio(format, pcmBytes.array());
-        } finally {
-            MemoryUtil.memFree(pcm);
+            AudioFormat format = new AudioFormat(source.getSampleRate(), 16, source.getChannels(), true, false);
+            return new DecodedAudio(format, output.toByteArray());
         }
     }
 

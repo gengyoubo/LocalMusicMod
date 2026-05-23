@@ -1,0 +1,49 @@
+name: Update Music Library
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'musiclibraries/*.ogg'
+      - 'musiclibraries/**/*.ogg'
+      - 'musiclibraries/metadata.json'
+      - 'scripts/generate_music_library.py'
+
+permissions:
+  contents: write
+
+jobs:
+  update-library:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate library.json
+        run: |
+          python scripts/generate_music_library.py \
+            --mode github \
+            --base-url "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/musiclibraries"
+
+      - name: Commit generated library.json
+        run: |
+          if git diff --quiet -- musiclibraries/library.json; then
+            echo "musiclibraries/library.json is already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add musiclibraries/library.json
+          git commit -m "Update music library"
+          git push

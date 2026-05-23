@@ -6,10 +6,10 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, unquote, urlparse
 
 
-AUDIO_EXTENSIONS = {".ogg", ".wav"}
+AUDIO_EXTENSIONS = {".ogg"}
 
 
 def slug(value: str) -> str:
@@ -37,6 +37,13 @@ def existing_by_file(library: dict) -> dict[str, dict]:
         file_name = track.get("file")
         if isinstance(file_name, str):
             result[file_name] = track
+            continue
+
+        url = track.get("url")
+        if isinstance(url, str):
+            parsed_name = Path(unquote(urlparse(url).path)).name
+            if parsed_name:
+                result[parsed_name] = track
     return result
 
 
