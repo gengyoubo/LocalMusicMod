@@ -1,0 +1,18 @@
+{
+  "itemGroup.localmusicmod.local_music": "Local Music",
+  "item.localmusicmod.music_book": "Music Book",
+  "item.localmusicmod.music_book.tooltip": "Open the local and GitHub music library",
+  "screen.localmusicmod.music_book": "Music Book",
+  "screen.localmusicmod.music_book.refresh": "Refresh",
+  "screen.localmusicmod.music_book.stop": "Stop",
+  "screen.localmusicmod.music_book.search": "Search tracks",
+  "screen.localmusicmod.music_book.url": "Paste .ogg or .wav URL",
+  "screen.localmusicmod.music_book.play_link": "Play URL",
+  "screen.localmusicmod.music_book.empty": "No tracks found",
+  "screen.localmusicmod.music_book.previous": "Previous",
+  "screen.localmusicmod.music_book.next": "Next",
+  "localmusicmod.configuration.title": "Local music mod Configs",
+  "localmusicmod.configuration.section.localmusicmod.common.toml": "Local music mod Configs",
+  "localmusicmod.configuration.section.localmusicmod.common.toml.title": "Local music mod Configs",
+  "localmusicmod.configuration.enableGithubUrls": "Enable GitHub URLs"
+}

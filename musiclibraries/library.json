@@ -1,0 +1,67 @@
+{
+  "tracks": [
+    {
+      "id": "byoushin_accompaniment",
+      "title": "\u79d2\u91dd\u3092\u304b\u3080\u4f34\u594f",
+      "file": "\u79d2\u91dd\u3092\u304b\u3080\u4f34\u594f.wav",
+      "volume": 1.0,
+      "loop": false
+    },
+    {
+      "id": "special_love_accompaniment",
+      "title": "\u7279\u522b\u7684\u7231\u7ed9\u7279\u522b\u7684\u4f60\u4f34\u594f",
+      "file": "\u7279\u522b\u7684\u7231\u7ed9\u7279\u522b\u7684\u4f60\u4f34\u594f.wav",
+      "volume": 1.0,
+      "loop": false
+    },
+    {
+      "id": "special_love_vocal",
+      "title": "\u7279\u522b\u7684\u7231\u7ed9\u7279\u522b\u7684\u4f60\u4eba\u58f0",
+      "file": "\u7279\u522b\u7684\u7231\u7ed9\u7279\u522b\u7684\u4f60\u4eba\u58f0.wav",
+      "volume": 1.0,
+      "loop": false
+    },
+    {
+      "id": "kaiju_no_hana_accompaniment",
+      "title": "\u602a\u7363\u306e\u82b1\u4f34\u594f",
+      "file": "\u602a\u7363\u306e\u82b1\u4f34\u594f.wav",
+      "volume": 1.0,
+      "loop": false
+    },
+    {
+      "id": "kokoronashi_accompaniment",
+      "title": "\u5fc3\u505a\u3057\u4f34\u594f",
+      "file": "\u5fc3\u505a\u3057\u4f34\u594f.wav",
+      "volume": 1.0,
+      "loop": false
+    },
+    {
+      "id": "kokoronashi_vocal",
+      "title": "\u5fc3\u505a\u3057\u4eba\u58f0",
+      "file": "\u5fc3\u505a\u3057\u4eba\u58f0.wav",
+      "volume": 1.0,
+      "loop": false
+    },
+    {
+      "id": "hello_world_accompaniment",
+      "title": "\u4f60\u597d\u4e16\u754c\u4f34\u594f",
+      "file": "\u4f60\u597d\u4e16\u754c\u4f34\u594f.wav",
+      "volume": 1.0,
+      "loop": false
+    },
+    {
+      "id": "next_dawn_accompaniment",
+      "title": "\u4e0b\u4e00\u4e2a\u5929\u4eae\u4f34\u594f",
+      "file": "\u4e0b\u4e00\u4e2a\u5929\u4eae\u4f34\u594f.wav",
+      "volume": 1.0,
+      "loop": false
+    },
+    {
+      "id": "next_dawn_vocal",
+      "title": "\u4e0b\u4e00\u4e2a\u5929\u4eae\u4eba\u58f0",
+      "file": "\u4e0b\u4e00\u4e2a\u5929\u4eae\u4eba\u58f0.wav",
+      "volume": 1.0,
+      "loop": false
+    }
+  ]
+}

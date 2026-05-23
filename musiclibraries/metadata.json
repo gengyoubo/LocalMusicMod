@@ -1,0 +1,40 @@
+{
+  "tracks": {
+    "\u79d2\u91dd\u3092\u304b\u3080\u4f34\u594f.wav": {
+      "id": "byoushin_accompaniment",
+      "title": "\u79d2\u91dd\u3092\u304b\u3080\u4f34\u594f"
+    },
+    "\u7279\u522b\u7684\u7231\u7ed9\u7279\u522b\u7684\u4f60\u4f34\u594f.wav": {
+      "id": "special_love_accompaniment",
+      "title": "\u7279\u522b\u7684\u7231\u7ed9\u7279\u522b\u7684\u4f60\u4f34\u594f"
+    },
+    "\u7279\u522b\u7684\u7231\u7ed9\u7279\u522b\u7684\u4f60\u4eba\u58f0.wav": {
+      "id": "special_love_vocal",
+      "title": "\u7279\u522b\u7684\u7231\u7ed9\u7279\u522b\u7684\u4f60\u4eba\u58f0"
+    },
+    "\u602a\u7363\u306e\u82b1\u4f34\u594f.wav": {
+      "id": "kaiju_no_hana_accompaniment",
+      "title": "\u602a\u7363\u306e\u82b1\u4f34\u594f"
+    },
+    "\u5fc3\u505a\u3057\u4f34\u594f.wav": {
+      "id": "kokoronashi_accompaniment",
+      "title": "\u5fc3\u505a\u3057\u4f34\u594f"
+    },
+    "\u5fc3\u505a\u3057\u4eba\u58f0.wav": {
+      "id": "kokoronashi_vocal",
+      "title": "\u5fc3\u505a\u3057\u4eba\u58f0"
+    },
+    "\u4f60\u597d\u4e16\u754c\u4f34\u594f.wav": {
+      "id": "hello_world_accompaniment",
+      "title": "\u4f60\u597d\u4e16\u754c\u4f34\u594f"
+    },
+    "\u4e0b\u4e00\u4e2a\u5929\u4eae\u4f34\u594f.wav": {
+      "id": "next_dawn_accompaniment",
+      "title": "\u4e0b\u4e00\u4e2a\u5929\u4eae\u4f34\u594f"
+    },
+    "\u4e0b\u4e00\u4e2a\u5929\u4eae\u4eba\u58f0.wav": {
+      "id": "next_dawn_vocal",
+      "title": "\u4e0b\u4e00\u4e2a\u5929\u4eae\u4eba\u58f0"
+    }
+  }
+}
