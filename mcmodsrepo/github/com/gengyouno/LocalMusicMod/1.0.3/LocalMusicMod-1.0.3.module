@@ -1,0 +1,60 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "github.com.gengyouno",
+    "module": "LocalMusicMod",
+    "version": "1.0.3",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.5.0"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 25,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "LocalMusicMod-1.0.3-26.1.2-neoforge.jar",
+          "url": "LocalMusicMod-1.0.3-26.1.2-neoforge.jar",
+          "size": 71145,
+          "sha512": "27a37b2851d4ac2eaeb4ef8218b8ff217cf8f9a0313560b29bd69d3496cdbc92c2bb325775eaeef4ed9cdf9dcacd26090528485a08a55a8b1e71123badc5a4c4",
+          "sha256": "5d0651709acbc75673ef677d3db7bede51fb61ace3feed2a7c3dd8ce473be510",
+          "sha1": "6ef010064907daff67fa3f08d09dec4b3f81d3fd",
+          "md5": "2629cff4043c037d95954deacc8f7c5a"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 25,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "LocalMusicMod-1.0.3-26.1.2-neoforge.jar",
+          "url": "LocalMusicMod-1.0.3-26.1.2-neoforge.jar",
+          "size": 71145,
+          "sha512": "27a37b2851d4ac2eaeb4ef8218b8ff217cf8f9a0313560b29bd69d3496cdbc92c2bb325775eaeef4ed9cdf9dcacd26090528485a08a55a8b1e71123badc5a4c4",
+          "sha256": "5d0651709acbc75673ef677d3db7bede51fb61ace3feed2a7c3dd8ce473be510",
+          "sha1": "6ef010064907daff67fa3f08d09dec4b3f81d3fd",
+          "md5": "2629cff4043c037d95954deacc8f7c5a"
+        }
+      ]
+    }
+  ]
+}
