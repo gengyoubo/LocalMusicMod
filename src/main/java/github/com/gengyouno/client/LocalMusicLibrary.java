@@ -36,7 +36,7 @@ public final class LocalMusicLibrary {
         List<LocalMusicTrack> tracks = new ArrayList<>();
         Set<String> visitedLibraries = new HashSet<>();
 
-        String defaultLibraryUrl = Config.DEFAULT_LIBRARY_URL.get();
+        String defaultLibraryUrl = normalizeLibraryUrl(Config.DEFAULT_LIBRARY_URL.get());
         if (Config.ENABLE_GITHUB_URLS.getAsBoolean() && defaultLibraryUrl != null && !defaultLibraryUrl.isBlank()) {
             loadRemoteJson(defaultLibraryUrl, tracks, visitedLibraries);
         }
@@ -77,7 +77,7 @@ public final class LocalMusicLibrary {
             }
             loadJson(JsonParser.parseString(response.body()), URI.create(url), tracks, visitedLibraries);
         } catch (Exception exception) {
-            Localmusicmod.LOGGER.warn("Could not load remote music library {}", url, exception);
+            Localmusicmod.LOGGER.warn("Could not load remote music library {}. Check config/localmusicmod-common.toml if this URL is outdated.", url, exception);
         }
     }
 
@@ -161,6 +161,21 @@ public final class LocalMusicLibrary {
 
     private static boolean isHttpUrl(String value) {
         return value.startsWith("http://") || value.startsWith("https://");
+    }
+
+    private static String normalizeLibraryUrl(String url) {
+        if (url == null || url.isBlank()) {
+            return url;
+        }
+
+        String normalized = url
+                .replace("githubusercontent.com/gengyoubo/LocalMusicMode/main/", "githubusercontent.com/gengyoubo/LocalMusicMod/master/")
+                .replace("githubusercontent.com/gengyoubo/LocalMusicMode/master/", "githubusercontent.com/gengyoubo/LocalMusicMod/master/")
+                .replace("githubusercontent.com/gengyoubo/LocalMusicMod/main/", "githubusercontent.com/gengyoubo/LocalMusicMod/master/");
+        if (!normalized.equals(url)) {
+            Localmusicmod.LOGGER.info("Using migrated music library URL {}", normalized);
+        }
+        return normalized;
     }
 
     private static String resolveRemoteSibling(URI baseUri, String relativePath) {

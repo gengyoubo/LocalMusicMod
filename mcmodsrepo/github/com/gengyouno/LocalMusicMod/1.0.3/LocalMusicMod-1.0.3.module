@@ -27,11 +27,11 @@
         {
           "name": "LocalMusicMod-1.0.3-26.1.2-neoforge.jar",
           "url": "LocalMusicMod-1.0.3-26.1.2-neoforge.jar",
-          "size": 71145,
-          "sha512": "27a37b2851d4ac2eaeb4ef8218b8ff217cf8f9a0313560b29bd69d3496cdbc92c2bb325775eaeef4ed9cdf9dcacd26090528485a08a55a8b1e71123badc5a4c4",
-          "sha256": "5d0651709acbc75673ef677d3db7bede51fb61ace3feed2a7c3dd8ce473be510",
-          "sha1": "6ef010064907daff67fa3f08d09dec4b3f81d3fd",
-          "md5": "2629cff4043c037d95954deacc8f7c5a"
+          "size": 71415,
+          "sha512": "ebd2c3f77fc70b87653c30c5085fb9704d99b3d750d0dd67a54245aba174c22f4d1ac3739a68099ee5420d9d714849ff3b6ab215cfb04801d14f6270b6f89ce0",
+          "sha256": "1bf334f81f432f0f3531c4ccf1caa6390a35691e5bbf35ae53493c7119e8d643",
+          "sha1": "bb45e649f3e871167aac7854ad9632244516a55e",
+          "md5": "f4e12f63bd673ef10129a6a5a6e712ca"
         }
       ]
     },
@@ -48,11 +48,11 @@
         {
           "name": "LocalMusicMod-1.0.3-26.1.2-neoforge.jar",
           "url": "LocalMusicMod-1.0.3-26.1.2-neoforge.jar",
-          "size": 71145,
-          "sha512": "27a37b2851d4ac2eaeb4ef8218b8ff217cf8f9a0313560b29bd69d3496cdbc92c2bb325775eaeef4ed9cdf9dcacd26090528485a08a55a8b1e71123badc5a4c4",
-          "sha256": "5d0651709acbc75673ef677d3db7bede51fb61ace3feed2a7c3dd8ce473be510",
-          "sha1": "6ef010064907daff67fa3f08d09dec4b3f81d3fd",
-          "md5": "2629cff4043c037d95954deacc8f7c5a"
+          "size": 71415,
+          "sha512": "ebd2c3f77fc70b87653c30c5085fb9704d99b3d750d0dd67a54245aba174c22f4d1ac3739a68099ee5420d9d714849ff3b6ab215cfb04801d14f6270b6f89ce0",
+          "sha256": "1bf334f81f432f0f3531c4ccf1caa6390a35691e5bbf35ae53493c7119e8d643",
+          "sha1": "bb45e649f3e871167aac7854ad9632244516a55e",
+          "md5": "f4e12f63bd673ef10129a6a5a6e712ca"
         }
       ]
     }
