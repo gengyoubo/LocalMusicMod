@@ -20,6 +20,14 @@ public final class LocalMusicCommands {
                         .then(Commands.argument("track", StringArgumentType.word())
                                 .suggests((context, builder) -> SharedSuggestionProvider.suggest(LocalMusicLibrary.trackIds(), builder))
                                 .executes(context -> play(context, StringArgumentType.getString(context, "track")))))
+                .then(Commands.literal("upload")
+                        .then(Commands.argument("id", StringArgumentType.word())
+                                .then(Commands.argument("file", StringArgumentType.string())
+                                        .executes(context -> upload(
+                                                context,
+                                                StringArgumentType.getString(context, "id"),
+                                                StringArgumentType.getString(context, "file")
+                                        )))))
                 .then(Commands.literal("stop")
                         .executes(LocalMusicCommands::stop)));
     }
@@ -30,6 +38,12 @@ public final class LocalMusicCommands {
                 : LocalMusicLibrary.findTrack(requestedId).orElse(null);
 
         if (track == null) {
+            if (requestedId != null) {
+                LocalMusicClientNetworking.requestServerTrackPlay(requestedId);
+                context.getSource().sendSuccess(() -> Component.literal("Requested uploaded music from server: " + requestedId), false);
+                return 1;
+            }
+
             context.getSource().sendFailure(Component.literal(requestedId == null
                     ? "No music tracks found in musiclibraries JSON files"
                     : "Unknown music track: " + requestedId));
@@ -38,6 +52,12 @@ public final class LocalMusicCommands {
 
         LocalMusicClientNetworking.requestPlay(track);
         context.getSource().sendSuccess(() -> Component.literal("Queued music for all players: " + track.displayName()), false);
+        return 1;
+    }
+
+    private static int upload(CommandContext<CommandSourceStack> context, String id, String fileName) {
+        LocalMusicClientNetworking.uploadTrack(id, fileName);
+        context.getSource().sendSuccess(() -> Component.literal("Sending upload: " + id), false);
         return 1;
     }
 

@@ -95,6 +95,51 @@ public final class LocalMusicPlayer {
                 }));
     }
 
+    public static void playUploaded(String id, String title, String fileName, byte[] data, float volume, boolean loop) {
+        LocalMusicTrack track = new LocalMusicTrack(id, title, "uploaded://" + id + "/" + fileName, volume, loop);
+        int token;
+        synchronized (LocalMusicPlayer.class) {
+            stopLocked();
+            currentTrack = track;
+            token = ++playToken;
+        }
+
+        stopVanillaMusic();
+        tell(Component.literal("Loading uploaded music: " + track.displayName()));
+        CompletableFuture.supplyAsync(() -> loadClipFromBytes(fileName, data), AUDIO_WORKER)
+                .whenComplete((clip, throwable) -> Minecraft.getInstance().execute(() -> {
+                    if (throwable != null) {
+                        synchronized (LocalMusicPlayer.class) {
+                            if (token == playToken) {
+                                currentTrack = null;
+                            }
+                        }
+                        Localmusicmod.LOGGER.warn("Could not play uploaded music {}", id, throwable);
+                        tell(Component.literal("Could not play uploaded music: " + throwable.getMessage()));
+                        return;
+                    }
+
+                    synchronized (LocalMusicPlayer.class) {
+                        if (token != playToken) {
+                            clip.close();
+                            return;
+                        }
+
+                        currentClip = clip;
+                        applyVolumeLocked();
+                        clip.setFramePosition(0);
+                        if (pausedForGame) {
+                            wasRunningWhenPaused = true;
+                        } else if (loop) {
+                            clip.loop(Clip.LOOP_CONTINUOUSLY);
+                        } else {
+                            clip.start();
+                        }
+                    }
+                    tell(Component.literal("Now playing uploaded music: " + track.displayName()));
+                }));
+    }
+
     public static void stop() {
         synchronized (LocalMusicPlayer.class) {
             playToken++;
@@ -155,6 +200,22 @@ public final class LocalMusicPlayer {
         try {
             byte[] bytes = readTrackBytes(track);
             DecodedAudio audio = decode(track, bytes);
+            return openClip(track, audio);
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception.getMessage(), exception);
+        }
+    }
+
+    private static Clip loadClipFromBytes(String fileName, byte[] bytes) {
+        try {
+            DecodedAudio audio = decode(fileName, bytes);
+            return openClip(null, audio);
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception.getMessage(), exception);
+        }
+    }
+
+    private static Clip openClip(LocalMusicTrack track, DecodedAudio audio) throws Exception {
             Clip clip = AudioSystem.getClip();
             clip.open(audio.format(), audio.data(), 0, audio.data().length);
             clip.addLineListener(event -> {
@@ -163,7 +224,8 @@ public final class LocalMusicPlayer {
                 }
 
                 synchronized (LocalMusicPlayer.class) {
-                    if (currentClip == clip && !track.loop() && clip.getFramePosition() >= clip.getFrameLength()) {
+                    boolean looping = currentTrack != null && currentTrack.loop();
+                    if (currentClip == clip && !looping && clip.getFramePosition() >= clip.getFrameLength()) {
                         clip.close();
                         currentClip = null;
                         currentTrack = null;
@@ -171,9 +233,6 @@ public final class LocalMusicPlayer {
                 }
             });
             return clip;
-        } catch (Exception exception) {
-            throw new IllegalStateException(exception.getMessage(), exception);
-        }
     }
 
     private static byte[] readTrackBytes(LocalMusicTrack track) throws IOException, InterruptedException {
@@ -198,7 +257,10 @@ public final class LocalMusicPlayer {
     }
 
     private static DecodedAudio decode(LocalMusicTrack track, byte[] bytes) throws Exception {
-        String name = URI.create(track.url()).getPath();
+        return decode(URI.create(track.url()).getPath(), bytes);
+    }
+
+    private static DecodedAudio decode(String name, byte[] bytes) throws Exception {
         String lowerName = name.toLowerCase(Locale.ROOT);
 
         if (lowerName.endsWith(".ogg")) {

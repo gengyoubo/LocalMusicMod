@@ -3,6 +3,7 @@ package github.com.gengyouno;
 import github.com.gengyouno.client.LocalMusicCommands;
 import github.com.gengyouno.client.LocalMusicPlayer;
 import github.com.gengyouno.client.PauseAudioController;
+import github.com.gengyouno.client.UploadDirectory;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -24,6 +25,7 @@ public class LocalmusicmodClient {
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
         Localmusicmod.LOGGER.info("Local music client loaded");
+        UploadDirectory.ensureExists();
     }
 
     @SubscribeEvent
