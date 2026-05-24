@@ -1,14 +1,11 @@
 package github.com.gengyouno.client;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -25,36 +22,19 @@ import com.google.gson.JsonParser;
 
 import github.com.gengyouno.Config;
 import github.com.gengyouno.Localmusicmod;
-import net.minecraft.client.Minecraft;
 
 public final class LocalMusicLibrary {
     private static final HttpClient HTTP = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
+            .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
     private LocalMusicLibrary() {
     }
 
     public static List<LocalMusicTrack> loadTracks() {
-        Path root = findLibraryRoot();
         List<LocalMusicTrack> tracks = new ArrayList<>();
         Set<String> visitedLibraries = new HashSet<>();
-
-        if (Files.isDirectory(root)) {
-            try (var paths = Files.walk(root)) {
-                List<Path> jsonFiles = paths
-                        .filter(Files::isRegularFile)
-                        .filter(LocalMusicLibrary::isJsonFile)
-                        .sorted()
-                        .toList();
-
-                for (Path jsonFile : jsonFiles) {
-                    loadLocalJson(jsonFile, tracks, visitedLibraries);
-                }
-            } catch (IOException exception) {
-                Localmusicmod.LOGGER.warn("Could not scan local music library {}", root, exception);
-            }
-        }
 
         String defaultLibraryUrl = Config.DEFAULT_LIBRARY_URL.get();
         if (Config.ENABLE_GITHUB_URLS.getAsBoolean() && defaultLibraryUrl != null && !defaultLibraryUrl.isBlank()) {
@@ -80,19 +60,6 @@ public final class LocalMusicLibrary {
         return loadTracks().stream().map(LocalMusicTrack::id).toList();
     }
 
-    private static void loadLocalJson(Path jsonFile, List<LocalMusicTrack> tracks, Set<String> visitedLibraries) {
-        String key = jsonFile.toAbsolutePath().normalize().toString();
-        if (!visitedLibraries.add(key)) {
-            return;
-        }
-
-        try (Reader reader = Files.newBufferedReader(jsonFile, StandardCharsets.UTF_8)) {
-            loadJson(JsonParser.parseReader(reader), jsonFile.getParent(), tracks, visitedLibraries);
-        } catch (Exception exception) {
-            Localmusicmod.LOGGER.warn("Could not load music library {}", jsonFile, exception);
-        }
-    }
-
     private static void loadRemoteJson(String url, List<LocalMusicTrack> tracks, Set<String> visitedLibraries) {
         if (!visitedLibraries.add(url)) {
             return;
@@ -114,21 +81,13 @@ public final class LocalMusicLibrary {
         }
     }
 
-    private static void loadJson(JsonElement element, Path baseDirectory, List<LocalMusicTrack> tracks, Set<String> visitedLibraries) {
-        loadJson(element, baseDirectory, null, tracks, visitedLibraries);
-    }
-
     private static void loadJson(JsonElement element, URI baseUri, List<LocalMusicTrack> tracks, Set<String> visitedLibraries) {
-        loadJson(element, null, baseUri, tracks, visitedLibraries);
-    }
-
-    private static void loadJson(JsonElement element, Path baseDirectory, URI baseUri, List<LocalMusicTrack> tracks, Set<String> visitedLibraries) {
         if (element == null || element.isJsonNull()) {
             return;
         }
 
         if (element.isJsonArray()) {
-            addTracks(element.getAsJsonArray(), baseDirectory, baseUri, tracks);
+            addTracks(element.getAsJsonArray(), baseUri, tracks);
             return;
         }
 
@@ -146,30 +105,28 @@ public final class LocalMusicLibrary {
                 String location = library.getAsString();
                 if (isHttpUrl(location)) {
                     loadRemoteJson(location, tracks, visitedLibraries);
-                } else if (baseDirectory != null) {
-                    loadLocalJson(baseDirectory.resolve(location).normalize(), tracks, visitedLibraries);
-                } else if (baseUri != null) {
+                } else {
                     loadRemoteJson(resolveRemoteSibling(baseUri, location), tracks, visitedLibraries);
                 }
             }
         }
 
         if (object.has("tracks") && object.get("tracks").isJsonArray()) {
-            addTracks(object.getAsJsonArray("tracks"), baseDirectory, baseUri, tracks);
+            addTracks(object.getAsJsonArray("tracks"), baseUri, tracks);
         } else if (object.has("file") || object.has("path") || object.has("url")) {
-            addTrack(object, baseDirectory, baseUri, tracks);
+            addTrack(object, baseUri, tracks);
         }
     }
 
-    private static void addTracks(JsonArray array, Path baseDirectory, URI baseUri, List<LocalMusicTrack> tracks) {
+    private static void addTracks(JsonArray array, URI baseUri, List<LocalMusicTrack> tracks) {
         for (JsonElement element : array) {
             if (element.isJsonObject()) {
-                addTrack(element.getAsJsonObject(), baseDirectory, baseUri, tracks);
+                addTrack(element.getAsJsonObject(), baseUri, tracks);
             }
         }
     }
 
-    private static void addTrack(JsonObject object, Path baseDirectory, URI baseUri, List<LocalMusicTrack> tracks) {
+    private static void addTrack(JsonObject object, URI baseUri, List<LocalMusicTrack> tracks) {
         String id = getString(object, "id", null);
         String title = getString(object, "title", id);
         String url = getString(object, "url", null);
@@ -177,24 +134,17 @@ public final class LocalMusicLibrary {
         float volume = getFloat(object, "volume", 1.0F);
         boolean loop = getBoolean(object, "loop", false);
 
-        Path file = null;
-        if (fileName != null && !fileName.isBlank()) {
-            if (baseDirectory != null) {
-                Path raw = Path.of(fileName);
-                file = raw.isAbsolute() ? raw.normalize() : baseDirectory.resolve(raw).normalize();
-            } else if ((url == null || url.isBlank()) && baseUri != null) {
-                url = resolveRemoteSibling(baseUri, preferRemoteOgg(fileName));
-            }
+        if ((url == null || url.isBlank()) && fileName != null && !fileName.isBlank()) {
+            url = resolveRemoteSibling(baseUri, preferRemoteOgg(fileName));
+        } else if (url != null && !url.isBlank() && !isHttpUrl(url)) {
+            url = resolveRemoteSibling(baseUri, url);
         }
 
         if ((id == null || id.isBlank()) && title != null && !title.isBlank()) {
             id = normalizeId(title);
         }
-        if ((id == null || id.isBlank()) && file != null) {
-            id = stripExtension(file.getFileName().toString());
-        }
         if ((id == null || id.isBlank()) && url != null) {
-            id = stripExtension(Path.of(URI.create(url).getPath()).getFileName().toString());
+            id = stripExtension(lastUrlPathSegment(url));
         }
 
         id = normalizeId(id);
@@ -202,45 +152,11 @@ public final class LocalMusicLibrary {
             id = generatedId(title, fileName, url);
         }
 
-        if (id.isBlank() || (file == null && (url == null || url.isBlank()))) {
+        if (id.isBlank() || url == null || url.isBlank() || !isHttpUrl(url)) {
             return;
         }
 
-        tracks.add(new LocalMusicTrack(id, title, file, url, Math.max(0.0F, volume), loop));
-    }
-
-    private static Path findLibraryRoot() {
-        String configured = System.getProperty("localmusicmod.libraryDir");
-        if (configured == null || configured.isBlank()) {
-            configured = System.getenv("LOCALMUSICMOD_LIBRARY_DIR");
-        }
-        if (configured != null && !configured.isBlank()) {
-            return Path.of(configured).toAbsolutePath().normalize();
-        }
-
-        List<Path> starts = new ArrayList<>();
-        starts.add(Path.of("").toAbsolutePath());
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.gameDirectory != null) {
-            starts.add(minecraft.gameDirectory.toPath().toAbsolutePath());
-        }
-
-        for (Path start : starts) {
-            Path current = start.normalize();
-            for (int i = 0; i < 6 && current != null; i++) {
-                Path candidate = current.resolve("musiclibraries");
-                if (Files.isDirectory(candidate)) {
-                    return candidate;
-                }
-                current = current.getParent();
-            }
-        }
-
-        return starts.getFirst().resolve("musiclibraries").normalize();
-    }
-
-    private static boolean isJsonFile(Path path) {
-        return path.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".json");
+        tracks.add(new LocalMusicTrack(id, title, url, Math.max(0.0F, volume), loop));
     }
 
     private static boolean isHttpUrl(String value) {
@@ -310,5 +226,11 @@ public final class LocalMusicLibrary {
     private static String stripExtension(String value) {
         int dot = value.lastIndexOf('.');
         return dot <= 0 ? value : value.substring(0, dot);
+    }
+
+    private static String lastUrlPathSegment(String url) {
+        String path = URI.create(url).getPath();
+        int slash = path.lastIndexOf('/');
+        return slash < 0 ? path : path.substring(slash + 1);
     }
 }

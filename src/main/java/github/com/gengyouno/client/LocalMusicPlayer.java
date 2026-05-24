@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -31,6 +30,7 @@ import net.minecraft.sounds.SoundSource;
 public final class LocalMusicPlayer {
     private static final HttpClient HTTP = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
+            .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
     private static final ExecutorService AUDIO_WORKER = Executors.newSingleThreadExecutor(runnable -> {
         Thread thread = new Thread(runnable, "LocalMusicMod-Audio");
@@ -41,6 +41,8 @@ public final class LocalMusicPlayer {
     private static Clip currentClip;
     private static LocalMusicTrack currentTrack;
     private static int playToken;
+    private static boolean pausedForGame;
+    private static boolean wasRunningWhenPaused;
 
     private LocalMusicPlayer() {
     }
@@ -57,6 +59,7 @@ public final class LocalMusicPlayer {
             token = ++playToken;
         }
 
+        stopVanillaMusic();
         tell(Component.literal("Loading music: " + track.displayName()));
         CompletableFuture.supplyAsync(() -> loadClip(track), AUDIO_WORKER)
                 .whenComplete((clip, throwable) -> Minecraft.getInstance().execute(() -> {
@@ -80,7 +83,9 @@ public final class LocalMusicPlayer {
                         currentClip = clip;
                         applyVolumeLocked();
                         clip.setFramePosition(0);
-                        if (track.loop()) {
+                        if (pausedForGame) {
+                            wasRunningWhenPaused = true;
+                        } else if (track.loop()) {
                             clip.loop(Clip.LOOP_CONTINUOUSLY);
                         } else {
                             clip.start();
@@ -94,12 +99,56 @@ public final class LocalMusicPlayer {
         synchronized (LocalMusicPlayer.class) {
             playToken++;
             stopLocked();
+            wasRunningWhenPaused = false;
         }
         tell(Component.literal("Music stopped"));
     }
 
     public static synchronized void updateVolume() {
         applyVolumeLocked();
+    }
+
+    public static void suppressVanillaMusic() {
+        if (hasActiveTrack()) {
+            stopVanillaMusic();
+        }
+    }
+
+    public static synchronized void setGamePaused(boolean paused) {
+        if (pausedForGame == paused) {
+            return;
+        }
+
+        pausedForGame = paused;
+        if (currentClip == null) {
+            wasRunningWhenPaused = false;
+            return;
+        }
+
+        if (paused) {
+            wasRunningWhenPaused = currentClip.isRunning();
+            if (wasRunningWhenPaused) {
+                currentClip.stop();
+            }
+            return;
+        }
+
+        if (wasRunningWhenPaused) {
+            if (currentTrack != null && currentTrack.loop()) {
+                currentClip.loop(Clip.LOOP_CONTINUOUSLY);
+            } else {
+                currentClip.start();
+            }
+        }
+        wasRunningWhenPaused = false;
+    }
+
+    private static synchronized boolean hasActiveTrack() {
+        return currentTrack != null || currentClip != null;
+    }
+
+    private static void stopVanillaMusic() {
+        Minecraft.getInstance().getMusicManager().stopPlaying();
     }
 
     private static Clip loadClip(LocalMusicTrack track) {
@@ -128,33 +177,28 @@ public final class LocalMusicPlayer {
     }
 
     private static byte[] readTrackBytes(LocalMusicTrack track) throws IOException, InterruptedException {
-        if (track.url() != null && !track.url().isBlank()) {
-            if (!Config.ENABLE_GITHUB_URLS.getAsBoolean()) {
-                throw new IOException("Remote music URLs are disabled in the config");
-            }
-
-            HttpRequest request = HttpRequest.newBuilder(URI.create(track.url()))
-                    .timeout(Duration.ofSeconds(30))
-                    .header("User-Agent", "LocalMusicMod")
-                    .GET()
-                    .build();
-            HttpResponse<byte[]> response = HTTP.send(request, HttpResponse.BodyHandlers.ofByteArray());
-            if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                throw new IOException("HTTP " + response.statusCode() + " for " + track.url());
-            }
-            return response.body();
+        if (track.url() == null || track.url().isBlank()) {
+            throw new IOException("Track has no remote URL");
         }
 
-        if (track.file() == null) {
-            throw new IOException("Track has no file or URL");
+        if (!Config.ENABLE_GITHUB_URLS.getAsBoolean()) {
+            throw new IOException("Remote music URLs are disabled in the config");
         }
-        return Files.readAllBytes(track.file());
+
+        HttpRequest request = HttpRequest.newBuilder(URI.create(track.url()))
+                .timeout(Duration.ofSeconds(30))
+                .header("User-Agent", "LocalMusicMod")
+                .GET()
+                .build();
+        HttpResponse<byte[]> response = HTTP.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new IOException("HTTP " + response.statusCode() + " for " + track.url());
+        }
+        return response.body();
     }
 
     private static DecodedAudio decode(LocalMusicTrack track, byte[] bytes) throws Exception {
-        String name = track.url() != null && !track.url().isBlank()
-                ? URI.create(track.url()).getPath()
-                : track.file().getFileName().toString();
+        String name = URI.create(track.url()).getPath();
         String lowerName = name.toLowerCase(Locale.ROOT);
 
         if (lowerName.endsWith(".ogg")) {
@@ -210,6 +254,7 @@ public final class LocalMusicPlayer {
             currentClip = null;
         }
         currentTrack = null;
+        wasRunningWhenPaused = false;
     }
 
     private static void applyVolumeLocked() {

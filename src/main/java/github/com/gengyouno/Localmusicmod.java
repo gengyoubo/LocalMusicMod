@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import github.com.gengyouno.command.LocalMusicServerCommands;
 import github.com.gengyouno.item.MusicBookItem;
 import github.com.gengyouno.network.LocalMusicNetworking;
 import net.minecraft.core.registries.Registries;
@@ -16,6 +17,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -40,6 +42,7 @@ public class Localmusicmod {
     public Localmusicmod(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(LocalMusicNetworking::register);
+        NeoForge.EVENT_BUS.addListener(LocalMusicServerCommands::register);
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

@@ -155,7 +155,7 @@ public class LocalMusicBookScreen extends Screen {
             return;
         }
 
-        LocalMusicClientNetworking.requestPlay(new LocalMusicTrack("direct_link", "Direct Link", null, directUrl, 1.0F, false));
+        LocalMusicClientNetworking.requestPlay(new LocalMusicTrack("direct_link", "Direct Link", directUrl, 1.0F, false));
     }
 
     private int tracksPerPage(int y) {

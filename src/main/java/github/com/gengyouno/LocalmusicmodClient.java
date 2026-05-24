@@ -2,6 +2,7 @@ package github.com.gengyouno;
 
 import github.com.gengyouno.client.LocalMusicCommands;
 import github.com.gengyouno.client.LocalMusicPlayer;
+import github.com.gengyouno.client.PauseAudioController;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -32,6 +33,8 @@ public class LocalmusicmodClient {
 
     @SubscribeEvent
     static void onClientTick(ClientTickEvent.Post event) {
+        PauseAudioController.update();
+        LocalMusicPlayer.suppressVanillaMusic();
         LocalMusicPlayer.updateVolume();
     }
 }

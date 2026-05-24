@@ -13,8 +13,7 @@ public final class LocalMusicClientNetworking {
     public static void requestPlay(LocalMusicTrack track) {
         String url = track.url() == null ? "" : track.url();
         if (url.isBlank()) {
-            tell(Component.literal("This track has no remote URL, so only you can hear it."));
-            LocalMusicPlayer.play(track);
+            tell(Component.literal("This track has no remote URL."));
             return;
         }
 
@@ -29,7 +28,6 @@ public final class LocalMusicClientNetworking {
         LocalMusicPlayer.play(new LocalMusicTrack(
                 payload.id(),
                 payload.title(),
-                null,
                 payload.url(),
                 payload.volume(),
                 payload.loop()
