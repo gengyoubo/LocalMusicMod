@@ -64,6 +64,13 @@
       "url": "https://raw.githubusercontent.com/gengyoubo/LocalMusicMod/master/musiclibraries/%E7%89%B9%E5%88%AB%E7%9A%84%E7%88%B1%E7%BB%99%E7%89%B9%E5%88%AB%E7%9A%84%E4%BD%A0%E4%BC%B4%E5%A5%8F.ogg"
     },
     {
+      "id": "track_5c528b40",
+      "title": "\u76f8\u89c1\u300e\u5f88\u300f\u665a",
+      "volume": 1.0,
+      "loop": false,
+      "url": "https://raw.githubusercontent.com/gengyoubo/LocalMusicMod/master/musiclibraries/%E7%9B%B8%E8%A7%81%E3%80%8E%E5%BE%88%E3%80%8F%E6%99%9A.ogg"
+    },
+    {
       "id": "byoushin_accompaniment",
       "title": "\u79d2\u91dd\u3092\u304b\u3080\u4f34\u594f",
       "volume": 1.0,
