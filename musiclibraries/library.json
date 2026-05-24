@@ -1,5 +1,11 @@
 {
   "tracks": [
+    { "id": "xiangjianhenwan",
+      "title": "相见『很』晚",
+      "volume": 1.0,
+      "loop": false,
+      "url": "https://raw.githubusercontent.com/gengyoubo/LocalMusicMod/refs/heads/master/musiclibraries/%E7%9B%B8%E8%A7%81%E3%80%8E%E5%BE%88%E3%80%8F%E6%99%9A.ogg"
+    },
     {
       "id": "mela",
       "title": "mela!",
